@@ -1,11 +1,11 @@
 package com.ql.util.express.match;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class QLPattern {
 
@@ -22,22 +22,19 @@ public class QLPattern {
 		AtomicLong maxDeep = new AtomicLong(1);
 		QLMatchResultCache resultCache =new QLMatchResultCache(5);
 		ArrayListCache<QLMatchResultTree> arrayListCache = new ArrayListCache<QLMatchResultTree>(50);
-        MatchParamsPack staticParams = new MatchParamsPack(aManager, nodes, maxDeep, maxMatchPoint,resultCache,arrayListCache);
+		MatchParamsPack staticParams = new MatchParamsPack(aManager, nodes, maxDeep, maxMatchPoint, resultCache, arrayListCache);
 		QLMatchResult result  = findMatchStatementWithAddRootOptimizeStack(staticParams, pattern, point, true, 1);
 		if(printStackDepth) {
-            log.warn("递归堆栈深度:" + maxDeep.longValue() + "  重用QLMatchResult次数:" + resultCache.fetchCount
-					+ "  新建QLMatchResult次数:" + resultCache.newCount + "  新建ArrayList数量:" + arrayListCache.newCount);
-
-        }
+			log.warn("递归堆栈深度:" + maxDeep.longValue() + "  重用QLMatchResult次数:" + resultCache.fetchCount + "  新建QLMatchResult次数:" + resultCache.newCount + "  新建ArrayList数量:" + arrayListCache.newCount);
+		}
 		if(result == null || result.getMatchSize() == 0){
-			throw new Exception("程序错误，不满足语法规范，没有匹配到合适的语法,最大匹配致[0:" + (maxMatchPoint.longValue()-1) +"]");
+			throw new Exception("不满足语法规范，没有匹配到合适的语法,最大匹配至[0:" + (maxMatchPoint.longValue() - 1) + "]");
 		}else if(result != null && result.getMatchSize() != 1){
-			throw new Exception("程序错误，不满足语法规范，必须有一个根节点：" + pattern + ",最大匹配致[0:" + (maxMatchPoint.longValue()-1) +"]");
+			throw new Exception("不满足语法规范，必须有一个根节点：" + pattern + ",最大匹配至[0:" + (maxMatchPoint.longValue() - 1) + "]");
 		}
 		return result;
 	}
 	private  static QLMatchResult findMatchStatementWithAddRootOptimizeStack(MatchParamsPack staticParams,QLPatternNode pattern ,int point,boolean isRoot,int deep) throws Exception{
-        
         INodeTypeManager aManager = staticParams.aManager;
         List<? extends IDataNode> nodes = staticParams.nodes;
         AtomicLong maxMatchPoint = staticParams.maxMatchPoint;
